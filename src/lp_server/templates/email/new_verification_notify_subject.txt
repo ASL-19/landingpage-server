@@ -1,0 +1,1 @@
+{% load i18n %}{% translate 'Welcome to BeePass Campaigns' context 'Email subject' %}

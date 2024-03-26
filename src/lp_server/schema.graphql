@@ -1,0 +1,1096 @@
+"""
+Can only be resolved by authenticated users.
+
+When the condition fails, the following can be returned (following this priority):
+1) `OperationInfo`/`OperationMessage` if those types are allowed at the return type
+2) `null` in case the field is not mandatory (e.g. `String` or `[String]`)
+3) An empty list in case the field is a list (e.g. `[String]!`)
+4) An empty `Connection` in case the return type is a relay connection
+2) Otherwise, an error will be raised
+"""
+directive @isAuthenticated repeatable on FIELD_DEFINITION
+
+input BlogFilter {
+  title: StrFilterLookup
+  published: DateFilterLookup
+  slug: StrFilterLookup
+  tags: NodeInput
+  AND: BlogFilter
+  OR: BlogFilter
+}
+
+type BlogIndexNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  title: String!
+  slug: String!
+  numchild: Int!
+  urlPath: String!
+  seoTitle: String!
+  searchDescription: String!
+  description: String!
+  image: ImageNode!
+}
+
+type BlogIndexNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [BlogIndexNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type BlogIndexNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: BlogIndexNode!
+}
+
+input CampaignFilter {
+  uniqueId: StrFilterLookup
+  organization: OrganizationFilter
+  name: String
+  planType: CampaignPlanType
+  targetRegions: RegionFilter
+  startDate: Date
+  endDate: Date
+  approved: Boolean
+  enabled: Boolean
+  draft: Boolean
+  removed: Boolean
+  AND: CampaignFilter
+  OR: CampaignFilter
+}
+
+type CampaignNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  uniqueId: String!
+  name: String!
+  organization: OrganizationNode!
+  planType: CampaignPlanType!
+  impressionPerPeriod: Int!
+  targetUrl: String
+  hasWebsite: Boolean!
+  source: String
+  medium: String
+  approved: Boolean!
+  enabled: Boolean!
+  draft: Boolean!
+  removed: Boolean!
+  initialDate: String @isAuthenticated
+  startDate: String @isAuthenticated
+  endDate: String @isAuthenticated
+  targetRegions: [RegionNode] @isAuthenticated
+  impressions(
+    orderBy: [String]
+    pagination: OffsetPaginationInput
+    filters: ImpressionFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): ImpressionNodeConnection! @isAuthenticated
+  requests(
+    orderBy: [String]
+    pagination: OffsetPaginationInput
+    filters: RequestFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): RequestNodeConnection! @isAuthenticated
+  dailyBudget: Float
+  budgetSpent: Float
+  totalImpressions(kind: String!, startDate: Date!, endDate: Date!, sourceId: Int = null): [ImpressionDataType] @isAuthenticated
+}
+
+type CampaignNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [CampaignNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type CampaignNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: CampaignNode!
+}
+
+enum CampaignPlanType {
+  ONETIME
+  MONTHLY
+}
+
+type CollapsibleBlock {
+  id: UUID!
+  value: GenericScalar
+  html: RichTextFieldType
+}
+
+"""Date (isoformat)"""
+scalar Date
+
+input DateFilterLookup {
+  exact: Date
+  iExact: Date
+  contains: Date
+  iContains: Date
+  inList: [Date!]
+  gt: Date
+  gte: Date
+  lt: Date
+  lte: Date
+  startsWith: Date
+  iStartsWith: Date
+  endsWith: Date
+  iEndsWith: Date
+  range: [Date!]
+  isNull: Boolean
+  regex: String
+  iRegex: String
+  nExact: Date
+  nIExact: Date
+  nContains: Date
+  nIContains: Date
+  nInList: [Date!]
+  nGt: Date
+  nGte: Date
+  nLt: Date
+  nLte: Date
+  nStartsWith: Date
+  nIStartsWith: Date
+  nEndsWith: Date
+  nIEndsWith: Date
+  nRange: [Date!]
+  nIsNull: Boolean
+  nRegex: String
+  nIRegex: String
+}
+
+"""Date with time (isoformat)"""
+scalar DateTime
+
+input DatetimeFilterLookup {
+  exact: DateTime
+  iExact: DateTime
+  contains: DateTime
+  iContains: DateTime
+  inList: [DateTime!]
+  gt: DateTime
+  gte: DateTime
+  lt: DateTime
+  lte: DateTime
+  startsWith: DateTime
+  iStartsWith: DateTime
+  endsWith: DateTime
+  iEndsWith: DateTime
+  range: [DateTime!]
+  isNull: Boolean
+  regex: String
+  iRegex: String
+  nExact: DateTime
+  nIExact: DateTime
+  nContains: DateTime
+  nIContains: DateTime
+  nInList: [DateTime!]
+  nGt: DateTime
+  nGte: DateTime
+  nLt: DateTime
+  nLte: DateTime
+  nStartsWith: DateTime
+  nIStartsWith: DateTime
+  nEndsWith: DateTime
+  nIEndsWith: DateTime
+  nRange: [DateTime!]
+  nIsNull: Boolean
+  nRegex: String
+  nIRegex: String
+}
+
+type DocumentBlock {
+  id: UUID!
+  value: GenericScalar
+  document: DocumentNode
+}
+
+type DocumentNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  fileSize: Int
+  url: String
+  fileType: String
+  contentType: String
+  fileHash: String!
+  title: String!
+  file: String!
+  createdAt: DateTime!
+  tags: [FlatTags]
+}
+
+type EmailBlock {
+  id: UUID!
+  value: GenericScalar
+}
+
+"\n     Errors messages and codes mapped to\n    fields or non fields errors.\n    Example:\n    {\n        field_name: [\n            {\n                \"message\": \"error message\",\n                \"code\": \"error_code\"\n            }\n        ],\n        other_field: [\n            {\n                \"message\": \"error message\",\n                \"code\": \"error_code\"\n            }\n        ],\n        nonFieldErrors: [\n            {\n                \"message\": \"error message\",\n                \"code\": \"error_code\"\n            }\n        ]\n    }\n    "
+scalar ExpectedError
+
+type FaqNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  question: String!
+  answer: String!
+}
+
+"""A connection to a list of items."""
+type FaqNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [FaqNodeEdge!]!
+}
+
+"""An edge in a connection."""
+type FaqNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: FaqNode!
+}
+
+""""""
+scalar FlatTags
+
+"""
+The GenericScalar scalar type represents a generic GraphQL scalar value that could be: List or Object.
+"""
+scalar GenericScalar
+
+"""
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+"""
+scalar GlobalID @specifiedBy(url: "https://relay.dev/graphql/objectidentification.htm")
+
+type HeadingBlock {
+  id: UUID!
+  value: GenericScalar
+}
+
+type ImageBlock {
+  id: UUID!
+  value: GenericScalar
+  image: ImageNode
+}
+
+type ImageNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  focalPointX: Int
+  focalPointY: Int
+  focalPointWidth: Int
+  focalPointHeight: Int
+  width: Int!
+  height: Int!
+  fileSize: Int
+  fileHash: String!
+  title: String!
+  file: String!
+  createdAt: DateTime!
+  rendition(max: String, min: String, width: Int, height: Int, fill: String, format: String, bgcolor: String, jpegquality: Int): ImageRendition
+  renditionList(sizes: [Int] = []): ImageRenditionList
+  tags: [FlatTags]
+}
+
+"""A connection to a list of items."""
+type ImageNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [ImageNodeEdge!]!
+}
+
+"""An edge in a connection."""
+type ImageNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: ImageNode!
+}
+
+type ImageRendition {
+  id: UUID!
+  url: String
+  width: Int
+  height: Int
+}
+
+type ImageRenditionList {
+  renditionList: [ImageRendition!]
+  srcSet: String
+}
+
+type ImpressionDataType {
+  date: DateTime!
+  totalImpressions: Int!
+  totalSpending: Float
+}
+
+input ImpressionFilter {
+  date: DateFilterLookup
+  AND: ImpressionFilter
+  OR: ImpressionFilter
+}
+
+type ImpressionNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  campaign: CampaignNode!
+  percentage: Int!
+  desired: Int!
+  actual: Int!
+  date: Date!
+  budgetSpent: Float
+}
+
+type ImpressionNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [ImpressionNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type ImpressionNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: ImpressionNode!
+}
+
+type LinkBlock {
+  id: UUID!
+  value: GenericScalar
+}
+
+type MediaBlock {
+  id: UUID!
+  value: GenericScalar
+  media: MediaNode
+}
+
+type MediaNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  url: String
+  fileType: String
+  contentType: String
+  fileHash: String!
+  title: String!
+  file: String!
+  type: String!
+  height: Int
+  width: Int
+  duration: Float!
+  thumbnail: String!
+  createdAt: DateTime!
+  tags: [FlatTags]
+}
+
+"""A connection to a list of items."""
+type MediaNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [MediaNodeEdge!]!
+}
+
+"""An edge in a connection."""
+type MediaNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: MediaNode!
+}
+
+type MinimalUserNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  role: UserRole!
+  isActive: Boolean!
+  username: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  timeZone: UserTimeZone!
+  organization: OrganizationNode!
+  invited: Boolean!
+  currency: UserCurrency!
+  pk: Int!
+}
+
+type MinimalUserNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [MinimalUserNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type MinimalUserNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: MinimalUserNode!
+}
+
+type Mutation {
+  "\n    Sign up user with fields defined in the settings.\n\n    If the email field of the user model is part of the\n    registration fields (default), check if there is\n    no user with that email or as a secondary email.\n\n    If it exists, it does not register the user,\n    even if the email field is not defined as unique\n    (default of the default django user model).\n\n    When creating the user, it also creates a `UserStatus`\n    related to that user, making it possible to track\n    if the user is archived, verified and has a secondary\n    email.\n\n    Send account verification email (setting value).\n\n    If allowed to not verify users login, return token.\n    "
+  signUp(password2: String!, org: String!, username: String!, firstName: String, lastName: String, password1: String!, email: String!): MutationNormalOutput!
+
+  "Send password reset email.\n\n    For non verified users, send an activation email instead.\n\n    If there is no user with the requested email, a successful response\n    is returned.\n    "
+  sendPasswordResetEmail(email: String!): MutationNormalOutput!
+
+  "Change user password without old password.\n\n    Receive the token that was sent by email.\n\n    If token and new passwords are valid, update user password and in\n    case of using refresh tokens, revoke all of them.\n\n    Also, if user has not been verified yet, verify it.\n    "
+  passwordReset(newPassword1: String!, newPassword2: String!, token: String!): MutationNormalOutput!
+
+  "Change account password when user knows the old password.\n\n    A new token and refresh token are sent. User must be verified.\n    "
+  passwordChange(newPassword1: String!, newPassword2: String!, oldPassword: String!): ObtainJSONWebTokenType!
+
+  "Archive account and revoke refresh tokens.\n\n    User must be verified and confirm password.\n    "
+  archiveAccount(password: String!): MutationNormalOutput!
+
+  "Delete account permanently or make `user.is_active=False`.\n\n    The behavior is defined on settings. Anyway user refresh tokens are\n    revoked.\n\n    User must be verified and confirm password.\n    "
+  deleteAccount(password: String!): MutationNormalOutput!
+
+  "\n    Update the account settings of the authenticated user\n    such as their first and last name.\n\n    A verified account is required.\n    "
+  updateAccount(firstName: String, timeZone: UserTimeZone, lastName: String, currency: UserCurrency): MutationNormalOutput!
+
+  "\n    Update the role of an existing user.\n\n    A Supervisor role is required for the caller.\n\n    The specified user needs to be in the same\n    organization of the caller.\n    "
+  updateTeamMemberRole(role: UserRole!, userId: Int!): MutationNormalOutput!
+
+  "\n    Create a new invitation object.\n\n    Send invitation email to the invited email address.\n\n    If there is no user with the requested email,\n    a successful response is returned.\n    "
+  inviteMember(organization: String, firstName: String, lastName: String, role: UserRole!, email: String!): MutationNormalOutput!
+
+  "\n    Remove an existing user in the organization.\n\n    A Supervisor role is required for the caller.\n\n    The specified user needs to be in the same\n    organization of the caller.\n    "
+  removeTeamMember(isActive: Boolean!, userId: Int!): MutationNormalOutput!
+
+  "Obtain JSON web token for given user.\n\n    Allow to perform login with different fields, The fields are defined\n    on settings.\n\n    Not verified users can log in by default. This can be changes on\n    settings.\n\n    If user is archived, make it unarchived and return\n    `unarchiving=True` on OutputBase.\n    "
+  tokenAuth(username: String!, password: String!): ObtainJSONWebTokenType!
+
+  "### Checks if a token is not expired and correct.\n\n    *Note that this is not for refresh tokens.*\n    "
+  verifyToken(token: String!): VerifyTokenType!
+
+  "### refreshToken to generate a new login token:\n\n    *Use this only if `JWT_LONG_RUNNING_REFRESH_TOKEN` is True*\n\n    using the refresh-token you already got during authorization, and\n    obtain a brand-new token (and possibly a new refresh token if you\n    revoked the previous). This is an alternative to log in when your\n    token expired.\n    "
+  refreshToken(revokeRefreshToken: Boolean!, refreshToken: String!): ObtainJSONWebTokenType!
+
+  "### Suspends a refresh token.\n\n    *token must exist to be revoked.*\n    "
+  revokeToken(refreshToken: String!): RevokeRefreshTokenType!
+
+  "\n    Create a new campaign\n\n    #### Args Ex:\n\n    name: \"test 1\"\n\n    uniqueId: \"test-1-campaign\"\n    **only lowercase [a-z], digits, and hyphens**\n\n    targetUrl: \"https://asl19.org\"\n    **https only**\n\n    planType: \"1\"\n    **ONE-TIME (1) or MONTHLY (2)**\n\n    source: \"beepass\"\n\n    medium: \"vpn\"\n\n    regionsList: \"mena, iran\"\n\n    startDate: \"2021-01-22\"\n    **YYY-MM-DD date format**\n\n    impressionPerPeriod: 20000\n    "
+  createCampaign(regionsList: String!, planType: CampaignPlanType!, startDate: String!, uniqueId: String!, medium: String, source: String, impressionPerPeriod: Int!, endDate: String, hasWebsite: Boolean, draft: Boolean, targetUrl: String, name: String!): MutationNormalOutput!
+
+  "\n    Duplicate an existing campaign by its uniqueId.\n\n    The uniqueId of the new campaign will be the same as the\n    original one suffixed with `.copy{count}`, e.g. copy1\n    "
+  duplicateCampaign(newStartDate: String, newEndDate: String, newTargetUrl: String, originalCampaignUniqueId: String!, newName: String!): MutationNormalOutput!
+
+  "\n    Remove an existing campaign by its uniqueId.\n\n    This will enable the `removed` boolean of the campaign and will not actually delete\n    the campaign object itself.\n    "
+  deleteCampaign(campaignUniqueIds: [String!]!): MutationNormalOutput!
+
+  "\n    Enable (activate) a campaign by its uniqueId.\n\n    The campaign to be enabled has to be approved and disabled.\n    Pending, expired, removed, or draft campaigns cannot be enabled nor disabled.\n    "
+  enableCampaign(campaignUniqueId: String!): MutationNormalOutput!
+
+  "\n    Disable (pause) a campaign by its uniqueId.\n\n    The campaign to be disabled has to be approved and enabled.\n    Pending, expired, removed, or draft campaigns cannot be enabled nor disabled.\n    "
+  disableCampaign(campaignUniqueId: String!): MutationNormalOutput!
+  suggestCampaignUniqueId(campaignName: String!): String!
+}
+
+type MutationNormalOutput {
+  success: Boolean!
+  errors: ExpectedError
+}
+
+"""An object with a Globally Unique ID"""
+interface Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+}
+
+"""Input of an object that implements the `Node` interface."""
+input NodeInput {
+  id: GlobalID!
+}
+
+"\n    encapsulates token data, and refresh token data if `JWT_LONG_RUNNING_REFRESH_TOKEN` is on.\n    with an output interface.\n    "
+type ObtainJSONWebTokenType implements OutputInterface {
+  success: Boolean!
+  errors: ExpectedError
+  user: UserType
+  token: TokenType
+  refreshToken: RefreshTokenType
+}
+
+input OffsetPaginationInput {
+  offset: Int! = 0
+  limit: Int! = -1
+}
+
+input OrganizationFilter {
+  name: StrFilterLookup
+  AND: OrganizationFilter
+  OR: OrganizationFilter
+}
+
+type OrganizationNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  name: String!
+  users(
+    orderBy: [String]
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): MinimalUserNodeConnection!
+  campaigns(
+    orderBy: [String]
+    filters: CampaignFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): CampaignNodeConnection! @isAuthenticated
+  totalActiveCampaigns: Int
+  last30DaysImpressions: Int
+  totalSpending: Float
+  last4DaysTotalImpressions: [ImpressionDataType]
+  totalImpressions(kind: String!, startDate: Date!, endDate: Date!): [ImpressionDataType]
+}
+
+interface OutputInterface {
+  success: Boolean!
+  errors: ExpectedError
+}
+
+"""Information to aid in pagination."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+type ParagraphBlock {
+  id: UUID!
+  value: GenericScalar
+  html: RichTextFieldType
+}
+
+union PostBody = HeadingBlock | ParagraphBlock | ImageBlock | DocumentBlock | MediaBlock | CollapsibleBlock | RelatedPostBlock
+
+type PostNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  title: String!
+  slug: String!
+  numchild: Int!
+  urlPath: String!
+  seoTitle: String!
+  searchDescription: String!
+  published: Date!
+  readTime: Float
+  synopsis: String
+  summary: String
+  featuredImage: ImageNode
+  featured: Boolean!
+  body: [PostBody!]
+  tags: [FlatTags]
+}
+
+type PostNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [PostNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type PostNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: PostNode!
+}
+
+type Query {
+  timezones: [UserTimeZone!]!
+  organization(id: ID!): OrganizationNode @isAuthenticated
+  me: UserNode
+  dailyPlan: ImpressionNode! @isAuthenticated
+  dailyPlans(
+    filters: ImpressionFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): ImpressionNodeConnection! @isAuthenticated
+  campaign(uniqueId: String!): CampaignNode @isAuthenticated
+  campaigns(before: String = null, after: String = null, first: Int = null, last: Int = null, offset: Int = null, orderBy: [String], filters: CampaignFilter): CampaignNodeConnection @isAuthenticated
+  blogIndex: BlogIndexNode @isAuthenticated
+  blogIndices(
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): BlogIndexNodeConnection! @isAuthenticated
+  post(slug: String!): PostNode @isAuthenticated
+  posts(
+    orderBy: [String]
+    pagination: OffsetPaginationInput
+    filters: BlogFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): PostNodeConnection! @isAuthenticated
+  images(
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): ImageNodeConnection!
+  image(pk: Int!): ImageNode
+  medias(
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): MediaNodeConnection!
+  media(pk: Int!): MediaNode
+  regions(
+    filters: RegionFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): RegionNodeConnection! @isAuthenticated
+  faqs(
+    filters: RegionFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): FaqNodeConnection! @isAuthenticated
+  region(pk: Int!): RegionNode @isAuthenticated
+  faq(pk: Int!): FaqNode @isAuthenticated
+  staticPage(slug: String!): StaticPageNode
+  staticPages(
+    orderBy: [String]
+    pagination: OffsetPaginationInput
+    filters: StaticPageFilter
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    after: String = null
+
+    """Returns the first n items from the list."""
+    first: Int = null
+
+    """Returns the items in the list that come after the specified cursor."""
+    last: Int = null
+  ): StaticPageNodeConnection!
+}
+
+"\nRefresh token can be used to obtain a new token instead of log in again\nwhen the token expires.\n\n*This is only used if `JWT_LONG_RUNNING_REFRESH_TOKEN` is set to True.*\n"
+type RefreshTokenType {
+  """randomly generated token that is attached to a FK user."""
+  token: String!
+  created: DateTime!
+  revoked: DateTime
+  expiresAt: DateTime!
+  isExpired: Boolean!
+}
+
+input RegionFilter {
+  name: StrFilterLookup
+  AND: RegionFilter
+  OR: RegionFilter
+}
+
+type RegionNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  name: String!
+}
+
+"""A connection to a list of items."""
+type RegionNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [RegionNodeEdge!]!
+}
+
+"""An edge in a connection."""
+type RegionNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: RegionNode!
+}
+
+type RelatedPostBlock {
+  value: GenericScalar!
+  relatedPosts: [PostNode]
+}
+
+input RequestFilter {
+  timestamp: DatetimeFilterLookup
+  AND: RequestFilter
+  OR: RequestFilter
+}
+
+type RequestNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  timestamp: DateTime!
+}
+
+type RequestNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [RequestNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type RequestNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: RequestNode!
+}
+
+type RevokeRefreshTokenType {
+  success: Boolean!
+  refreshToken: RefreshTokenType
+  errors: ExpectedError
+}
+
+"""Serialises RichText content into fully baked HTML"""
+scalar RichTextFieldType
+
+union StaticPageBody = ParagraphBlock | HeadingBlock | ImageBlock | DocumentBlock | MediaBlock | LinkBlock | EmailBlock
+
+type StaticPageFaqNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  question: String
+  answer: String
+}
+
+input StaticPageFilter {
+  title: StrFilterLookup
+  published: DateFilterLookup
+  slug: StrFilterLookup
+  AND: StaticPageFilter
+  OR: StaticPageFilter
+}
+
+type StaticPageNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  title: String!
+  slug: String!
+  numchild: Int!
+  urlPath: String!
+  seoTitle: String!
+  searchDescription: String!
+  published: Date!
+  image: ImageNode
+  faqs: [StaticPageFaqNode]
+  body: [StaticPageBody!]
+}
+
+type StaticPageNodeConnection {
+  """Pagination data for this connection"""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection"""
+  edges: [StaticPageNodeEdge!]!
+
+  """Total quantity of existing nodes."""
+  totalCount: Int
+  edgeCount: Int
+}
+
+"""An edge in a connection."""
+type StaticPageNodeEdge {
+  """A cursor for use in pagination"""
+  cursor: String!
+
+  """The item at the end of the edge"""
+  node: StaticPageNode!
+}
+
+input StrFilterLookup {
+  exact: String
+  iExact: String
+  contains: String
+  iContains: String
+  inList: [String!]
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  startsWith: String
+  iStartsWith: String
+  endsWith: String
+  iEndsWith: String
+  range: [String!]
+  isNull: Boolean
+  regex: String
+  iRegex: String
+  nExact: String
+  nIExact: String
+  nContains: String
+  nIContains: String
+  nInList: [String!]
+  nGt: String
+  nGte: String
+  nLt: String
+  nLte: String
+  nStartsWith: String
+  nIStartsWith: String
+  nEndsWith: String
+  nIEndsWith: String
+  nRange: [String!]
+  nIsNull: Boolean
+  nRegex: String
+  nIRegex: String
+}
+
+"\nthe data that was used to create the token.\n"
+type TokenPayloadType {
+  """when the token was created"""
+  origIat: DateTime!
+
+  """when the token will be expired"""
+  exp: DateTime!
+  username: String!
+}
+
+"\nencapsulates the token with the payload that was used to create the token.\n"
+type TokenType {
+  payload: TokenPayloadType!
+
+  """The encoded payload, namely a token."""
+  token: String!
+}
+
+scalar UUID
+
+enum UserCurrency {
+  CAD
+  IRR
+  USD
+  EUR
+}
+
+type UserNode implements Node {
+  """The Globally Unique ID of this object"""
+  id: GlobalID!
+  role: UserRole!
+  timeZone: UserTimeZone!
+  currency: UserCurrency!
+  organization: OrganizationNode!
+  username: String!
+  firstName: String!
+  lastName: String!
+  isActive: Boolean!
+  email: String!
+  invited: Boolean!
+  jwtSecret: UUID!
+  monitoringAccess: Boolean!
+  pk: Int!
+}
+
+enum UserRole {
+  SUPERVISOR
+  VIEWER
+}
+
+type UserStatusType {
+  verified: Boolean!
+  archived: Boolean!
+}
+
+"\n    Type that contains user time zone and its UTC offset,\n    e.g.:\n    {\n        displayName: \"US/Pacific\",\n        utc: \"-07:00\"\n    }\n    "
+scalar UserTimeZone
+
+type UserType {
+  logentrySet: [Node!]!
+  isSuperuser: Boolean!
+  lastLogin: DateTime
+  isStaff: Boolean!
+  isActive: Boolean!
+  dateJoined: DateTime!
+  status: UserStatusType!
+  timeZone: UserTimeZone
+  username: String!
+  id: GlobalID!
+  firstName: String
+  currency: UserCurrency
+  lastName: String
+  email: String!
+  archived: Boolean!
+  verified: Boolean!
+}
+
+type VerifyTokenType implements OutputInterface {
+  success: Boolean!
+  errors: ExpectedError
+  token: TokenType
+  user: UserType
+}

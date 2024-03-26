@@ -1,0 +1,16 @@
+{% load i18n %}<h3>BeePass Campaigns Notification</h3>
+
+{# Translators: Please keep the {{ value }} tags as they are #}
+<p>{% blocktranslate context 'New user email' with first_name=user.first_name last_name=user.last_name org=user.organization trimmed %}
+    A new user: {{ first_name }} {{ last_name }} representing {{ org }} has just signed up to BeePass Campaigns!
+{% endblocktranslate %}</p>
+{# Translators: This is part of the new-user notification email #}
+<p>{% translate 'The user will not be able to access BeePass Campaigns until their account gets verified.' context 'email instruction' %}</p>
+
+<p>{% translate 'You can verify the account of the new user from the admin panel on the link:' context 'email instruction' %}</p>
+
+<a href="{{ protocol }}://{{ request.get_host }}/{{ path }}/{{ user.pk }}/change/">
+{{ protocol }}://{{ request.get_host }}/{{ path }}/{{ user.pk }}/change/</a>
+
+{% translate 'From' as from %}
+<p>--{{ from }} {{ site_name }}</p>

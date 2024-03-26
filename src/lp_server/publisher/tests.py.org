@@ -1,0 +1,261 @@
+from django.test import TestCase
+
+# Create your tests here.
+from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User, Group
+
+from django.test import TestCase, RequestFactory, Client as DjangoClient
+from rest_framework import status
+from rest_framework.test import APITestCase,  APIClient, APIRequestFactory
+
+import copy
+
+from django.conf import settings
+from publisher.models import Publisher, Plan, Campaign, CampaignFundingHistory, CampaignConsumptionHistory
+from publisher.views import profile as publisher_profile
+from publisher.s3 import S3Manager
+
+from publisher.campaign_utils import CampaignManager
+
+import datetime, dateutil 
+import random, string
+
+import pdb             
+
+
+ep_list = [
+    '/publisher/profile/',
+]
+
+post_profile_ep = ep_list[0]
+
+class TestUtilities():
+    def __init__(self):
+        Group.objects.create(name='Publisher')
+                
+    def random_str(self, length):
+        letters = string.ascii_lowercase                             
+        return ''.join(random.choice(letters) for i in range(length))
+
+    def create_test_user(self, user_name = "", target_group_name = 'Publisher'):
+        if (user_name == ""):
+            user_name = self.random_str(32)
+        new_user = User.objects.create_user(
+            username=user_name, email=self.random_str(8)+'@'+self.random_str(8)+'.com', password='top_secret', is_active=True)
+        target_group = Group.objects.get(name=target_group_name) 
+        target_group.user_set.add(new_user)
+
+        return new_user
+
+    def create_test_campaign(self, test_user, fund = 0):
+        """
+        create a test campaign and fund it 
+        """
+        test_plan = Plan.objects.create(
+            name = self.random_str(32),
+            price_per_impression_rate = 0.0001)
+
+        test_campaign = Campaign.objects.create(
+            user = test_user,
+            unique_id = self.random_str(32),
+            name = self.random_str(32),
+            plan = test_plan,
+            description = self.random_str(32),
+            text_header = self.random_str(32),
+            text_body = "",
+            text_bw_or_color = False,
+            viste_site_button_bw_or_color = False,
+            viste_site_button_color = int("000000", 16),
+            visit_site_botton_type = 1,
+            background_color = int("FFFFFF", 16),
+            publish_name_on_homepage = True,
+            start_date = '2017-10-26 14:34:15',
+            end_date = '2017-10-27 14:34:15',
+            target_url = "https://www.candy.com",
+            enrollment_url = "https://www.candy.com/enroll",
+            approved = False,
+            flagged = 0)
+
+        return test_campaign
+
+    def fund_a_campaign(self, test_campaign, fund):
+        test_campaign_funding_record = CampaignFundingHistory.objects.create(
+            campaign = test_campaign,
+            amount = fund,
+            payment_date = '2017-10-26 14:34:15',
+            payment_confirmation = self.random_str(32)
+            )
+
+        return test_campaign_funding_record
+    
+    def spend_on_a_campaign(self, test_campaign, consumption = 0):
+        test_spent_funding_record = CampaignConsumptionHistory.objects.create(
+            campaign = test_campaign,
+            invoice_id = "ididdddd",
+            consumption_date = '2017-10-27 14:34:15',
+            number_of_impression = 1000,
+            consumed_amount = consumption
+            )
+
+        return test_spent_funding_record
+
+class APIPostTests(APITestCase):
+    sample_profile_submission = {
+        'display_name':'radio publish',
+        
+        'company_name': 'radio p',
+        'password_hash': 'hashme',
+        'security_question_1':'who are you',
+        'security_question_2': 'who am i',
+        'security_question_3': 'who are they',
+        'language':'en_CA',
+        'time_zone':'UTC',
+        'date_joined':'2017-10-26 14:34:15',
+        'publish_name_on_homepage':'True'}
+
+    def setUp(self):
+        self.test_utils = TestUtilities()
+        self.user = self.test_utils.create_test_user(user_name='radio_p')
+        self.user_password = 'top_secret'
+        self.user.set_password(self.user_password)
+        self.user.check_password(self.user_password)
+        self.user.save()
+        
+        self.factory = RequestFactory()
+        self.client.login(username='radio_p', password=self.user_password)
+
+    def test_login(self):
+        self.assertTrue(self.client.login(username='radio_p', password=self.user_password))
+
+    def test_forbid_unauthenticated_access(self):
+        unathenticated_request = APIRequestFactory().get('/publisher/profile/')
+        resp = publisher_profile(unathenticated_request)
+        
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        
+    def test_post_publisher_profile(self):
+        #one the difference between rest api client and django rest client is that
+        #the rest client takes care of csrf token
+        url = post_profile_ep;
+        test_post_sample_submission = copy.copy(self.sample_profile_submission)
+
+        resp = self.client.post(url, test_post_sample_submission)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        #Alternatively we can use force authentication with
+        #request, if the authentication backend changes
+        #i.e two factor auth
+        # from rest_framework.test import force_authenticate
+
+        # factory = APIRequestFactory()
+        # user = User.objects.get(username='olivia')
+        # view = AccountDetail.as_view()
+
+        # # Make an authenticated request to the view...
+        # request = factory.get('/accounts/django-superstars/')
+        # force_authenticate(request, user=user)
+        # response = view(request)
+        
+class CampaignTests(TestCase):
+    # We need to have publisher user
+    sample_payment_amount  = 100.04
+    sample_consumed_amount = 52.06
+
+    def setUp(self):
+        self.test_utils = TestUtilities()
+        self.test_user = self.test_utils.create_test_user()
+
+    def test_create_campaign(self):
+        test_plan = Plan.objects.create(
+            name = "Sample Plan")
+
+        test_campaign = Campaign.objects.create(
+            user = self.test_user,
+            name = "Free candy",
+            plan = test_plan,
+            description = "test Campaign",
+            text_header = "Free Candy!",
+            text_body = "Click here if you want a free candy",
+            text_bw_or_color = False,
+            viste_site_button_bw_or_color = False,
+            viste_site_button_color = int("000000", 16),
+            visit_site_botton_type = 1,
+            background_color = int("FFFFFF", 16),
+            publish_name_on_homepage = True,
+            start_date = dateutil.parser.parse('2017-10-26T14:34:15 UTC'),
+            end_date = dateutil.parser.parse('2017-10-27T14:34:15 UTC'),
+            target_url = "https://www.candy.com",
+            enrollment_url = "https://www.candy.com/enroll",
+            approved = False,
+            flagged = 0)
+
+        self.campagn = test_campaign
+
+    def test_fund_a_campaign(self):
+        test_campaign = self.test_utils.create_test_campaign(self.test_user, self.sample_payment_amount)
+        self.test_utils.fund_a_campaign(test_campaign, self.sample_payment_amount)
+        
+    def test_spend_on_a_campaign(self):
+        test_campaign = self.test_utils.create_test_campaign(self.test_user, self.sample_payment_amount)
+        self.test_utils.spend_on_a_campaign(test_campaign, self.sample_consumed_amount)
+            
+    def test_remaining_budget(self):
+        test_campaign = self.test_utils.create_test_campaign(self.test_user)
+        self.test_utils.fund_a_campaign(test_campaign, self.sample_payment_amount)
+        self.test_utils.spend_on_a_campaign(test_campaign, self.sample_consumed_amount)
+        self.assertEqual(test_campaign.remaining_budget, self.sample_payment_amount - self.sample_consumed_amount)
+
+class CampaignManagerTest(TestCase):
+    sample_payment_amount  = 100.04
+
+    def setUp(self):
+        self.test_campaign_manager = CampaignManager(logger) #make a campaign manager.
+        #we also need  a funded test campaiagn to updates its stat
+        self.test_utils = TestUtilities()
+        self.test_user = self.test_utils.create_test_user()
+        self.test_campaign = self.test_utils.create_test_campaign(self.test_user, CampaignTests.sample_payment_amount)
+
+        #we need an S3 Manager to submit simulated data on S3
+        self.test_s3_manager = S3Manager()
+
+        self.campaign_order_base_key = settings.AWS_S3_CAMPAIGN_ORDER_KEY
+        self.campaign_status_base_key = settings.AWS_S3_CAMPAIGN_STATUS_KEY
+
+    def test_update_campaigns_stats(self):
+        """
+        Make an active campaign and sends it stats to s3
+        """
+        #fund the campaign then bill it
+        self.test_utils.fund_a_campaign(self.test_campaign, self.sample_payment_amount)
+        #now bill a sample amount to by posting to S3
+        yesterday_date = (datetime.datetime.today() - datetime.timedelta(1)).strftime('%Y-%m-%d')
+
+        #make the correct dictionary3
+        partner_simulated_dict = [{}]
+        partner_simulated_dict[0]["id"] = self.test_campaign.unique_id
+        partner_simulated_dict[0]["invoice_id"] = self.test_utils.random_str(32);
+        partner_simulated_dict[0]["date"] = yesterday_date
+        partner_simulated_dict[0]["number_of_impression"] = random.randint(0,10000);
+
+        #post dictionary to S3
+        test_status_key = self.campaign_status_base_key + '-' + yesterday_date
+        self.test_s3_manager.write_config_to_s3(partner_simulated_dict, test_status_key)
+
+        #call CampaignManager to update campaign status
+        self.test_campaign_manager.update_campaigns_stats_from_shared_storage()
+
+        #and check if the status is updated as expected
+        self.assertEqual(round(self.test_campaign.remaining_budget,2), round(self.sample_payment_amount - (partner_simulated_dict[0]["number_of_impression"] * self.test_campaign.plan.price_per_impression_rate),2))
+        
+    def test_post_campaign_impression_quota(self):
+        #fund the campaign to get impression quota for today
+        self.test_utils.fund_a_campaign(self.test_campaign, self.sample_payment_amount)
+
+        self.test_campaign_manager.post_campaigns_impression_quota_to_shared_storage()
+        #now we are reading the dictionary and see if the correct number of
+        #impression has been posted therek
+        test_impression_dict = self.test_s3_manager.read_dict_from_s3(self.campaign_order_base_key + "-" + datetime.datetime.today().strftime('%Y-%m-%d'))
+
+        self.assertEqual(test_impression_dict[self.test_campaign.unique_id]["no_of_impressions"],
+        self.test_campaign.remaining_budget / self.test_campaign.plan.price_per_impression_rate)

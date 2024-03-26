@@ -1,0 +1,12 @@
+{% load i18n %}{# Translators: Please keep the {{ value }} tags as they are #}
+<p>{% blocktranslate context 'Welcome email' with first_name=user.first_name trimmed %}
+    Hi {{ first_name }},
+{% endblocktranslate %}</p>
+{# Translators: This is part of the new-user notification email #}
+<p>{% translate 'Your account has been verified!' context 'Welcome email' %}</p>
+
+<p>{% translate 'You can now login to BeePass Campaigns via the following link:' context 'Welcome email' %}</p>
+<a href="{{ protocol }}://{{ domain }}/{{ language }}/{{ path }}/">{{ protocol }}://{{ domain }}/{{ language }}/{{ path }}/</a>
+
+<p>{% translate 'Cheers,' context 'Email content' %}</p>
+<p>{% translate 'BeePass Campaigns Team' context 'Email content' %}</p>

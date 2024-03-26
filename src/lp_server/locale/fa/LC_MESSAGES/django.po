@@ -1,0 +1,480 @@
+# BeePass Campaigns Translations
+# This file is distributed under the same license as the PACKAGE package.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BeePass Campaigns\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-07 15:49+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: accounts/exceptions.py:19
+msgid "Wrong usage, check your code!."
+msgstr ""
+
+#: accounts/models.py:14
+msgid "SUPERVISOR"
+msgstr ""
+
+#: accounts/models.py:15
+msgid "VIEWER"
+msgstr ""
+
+#: accounts/models.py:19
+msgid "CAD"
+msgstr ""
+
+#: accounts/models.py:20
+msgid "IRR"
+msgstr ""
+
+#: accounts/models.py:21
+msgid "USD"
+msgstr ""
+
+#: accounts/models.py:22
+msgid "EUR"
+msgstr ""
+
+#: accounts/models.py:31
+msgid "name"
+msgstr ""
+
+#: accounts/models.py:35
+msgid "The name of organization"
+msgstr ""
+
+#: accounts/models.py:56 accounts/models.py:125
+msgid "role"
+msgstr ""
+
+#: accounts/models.py:61
+msgid "time zone"
+msgstr ""
+
+#: accounts/models.py:65
+msgid "The timezone where the user resides in"
+msgstr ""
+
+#: accounts/models.py:67
+msgid "currency"
+msgstr ""
+
+#: accounts/models.py:71
+msgid "The currency of any budget the user may view"
+msgstr ""
+
+#: accounts/models.py:73
+msgid "invited"
+msgstr ""
+
+#: accounts/models.py:113
+msgid "invitee first name"
+msgstr ""
+
+#: accounts/models.py:117
+msgid "invitee last name"
+msgstr ""
+
+#: accounts/models.py:121
+msgid "invitee email address"
+msgstr ""
+
+#: accounts/models.py:130
+msgid "accepted"
+msgstr ""
+
+#: accounts/models.py:133
+msgid "created"
+msgstr ""
+
+#: accounts/schema.py:200
+msgid "Unauthorized"
+msgstr ""
+
+#: blog/apps.py:30
+msgid "Blog"
+msgstr ""
+
+#: distribution/models.py:143
+msgid "Not applicable"
+msgstr ""
+
+#: distribution/models.py:144
+msgid "Inactive Key Removal"
+msgstr ""
+
+#: distribution/models.py:198
+msgid "Deletion Cause"
+msgstr ""
+
+#: distribution/models.py:229
+msgid "TEXT"
+msgstr ""
+
+#: distribution/models.py:230
+msgid "HTML"
+msgstr ""
+
+#: distribution/models.py:231
+msgid "MARKDOWN"
+msgstr ""
+
+#: distribution/models.py:235 distribution/models.py:320
+msgid "PENDING"
+msgstr ""
+
+#: distribution/models.py:236 distribution/models.py:321
+msgid "SCHEDULED"
+msgstr ""
+
+#: distribution/models.py:237 distribution/models.py:322
+msgid "SENT"
+msgstr ""
+
+#: distribution/models.py:238
+msgid "OPTED OUT"
+msgstr ""
+
+#: distribution/models.py:239 distribution/models.py:325
+msgid "FAILED"
+msgstr ""
+
+#: distribution/models.py:258 distribution/models.py:351
+msgid "Status"
+msgstr ""
+
+#: distribution/models.py:265
+msgid "Number of attempts"
+msgstr ""
+
+#: distribution/models.py:269
+msgid "Sent on"
+msgstr ""
+
+#: distribution/models.py:323
+msgid "INCOMPLETE"
+msgstr ""
+
+#: distribution/models.py:324
+msgid "IN PROGRESS"
+msgstr ""
+
+#: distribution/models.py:333
+msgid "Notify VPN users"
+msgstr ""
+
+#: distribution/models.py:334
+msgid "Deactivate keys"
+msgstr ""
+
+#: distribution/models.py:363
+msgid "Body Type"
+msgstr ""
+
+#: distribution/models.py:369
+msgid "Deadline"
+msgstr ""
+
+#: distribution/models.py:379
+msgid "Scheduled on"
+msgstr ""
+
+#: distribution/models.py:384
+msgid "Action"
+msgstr ""
+
+#: lp_server/constants.py:8
+msgid "Unauthenticated."
+msgstr ""
+
+#: lp_server/constants.py:11
+msgid "Your account has not been associated with an organization yet."
+msgstr ""
+
+#: lp_server/constants.py:14
+msgid "Failed to send email."
+msgstr ""
+
+#: lp_server/constants.py:17
+msgid "Your account has not been verified yet."
+msgstr ""
+
+#: lp_server/constants.py:20
+msgid "Your account is not an admin account."
+msgstr ""
+
+#: lp_server/constants.py:23
+msgid "The specified user does not exist in your organization."
+msgstr ""
+
+#: lp_server/constants.py:26
+msgid "You have to provide at least one account property to update."
+msgstr ""
+
+#: lp_server/constants.py:29
+msgid "Please provide a valid time zone."
+msgstr ""
+
+#: lp_server/constants.py:32
+msgid "Supervisors cannot downgrade their current role at this time."
+msgstr ""
+
+#: lp_server/constants.py:37
+msgid "An end date is required for a one-time campaign."
+msgstr ""
+
+#: lp_server/constants.py:40
+msgid "A monthly campaign must not have an end date."
+msgstr ""
+
+#: lp_server/constants.py:43
+msgid "The start date cannot precede the date of today."
+msgstr ""
+
+#: lp_server/constants.py:46
+msgid "The end date cannot precede the start date."
+msgstr ""
+
+#: lp_server/constants.py:49
+msgid "The specified campaign has to be disabled (paused) before the deletion."
+msgstr ""
+
+#: lp_server/constants.py:52
+msgid "The specified campaign is removed!"
+msgstr ""
+
+#: lp_server/constants.py:55
+msgid "The specified campaign is not approved!"
+msgstr ""
+
+#: lp_server/constants.py:58
+msgid "The specified campaign is already enabled!"
+msgstr ""
+
+#: lp_server/constants.py:61
+msgid "The specified campaign is already disabled!"
+msgstr ""
+
+#: lp_server/constants.py:64
+msgid ""
+"The current organization is not matching the organization of the campaign."
+msgstr ""
+
+#: lp_server/constants.py:67
+msgid "The specified unique Identifier (Unique Id) had been used before."
+msgstr ""
+
+#: lp_server/generics.py:34
+msgid "Order"
+msgstr ""
+
+#: lp_server/generics.py:119 preference/models.py:75
+msgid "Last Modified Time"
+msgstr ""
+
+#: lp_server/generics.py:122
+msgid "Title"
+msgstr ""
+
+#: lp_server/generics.py:126
+msgid "Content"
+msgstr ""
+
+#: lp_server/generics.py:131
+msgid "Tags"
+msgstr ""
+
+#: lp_server/helpers.py:13
+#, python-format
+msgid ""
+"'%(value)s' can only contain lower-case a-z, digits, and '-' (hyphen), and "
+"must not begin or end with '-'"
+msgstr ""
+
+#: lp_server/helpers.py:23
+msgid "Please enter a valid URL that starts with 'https://'"
+msgstr ""
+
+#: preference/models.py:72
+msgid "Language"
+msgstr ""
+
+#: preference/models.py:79
+msgid "About Paskoocheh"
+msgstr ""
+
+#: preference/models.py:84
+msgid "Contact Email"
+msgstr ""
+
+#: preference/models.py:88
+msgid "Privacy Policy"
+msgstr ""
+
+#: preference/models.py:92
+msgid "Terms of Service"
+msgstr ""
+
+#: preference/models.py:98
+msgid "Web Texts"
+msgstr ""
+
+#: publisher/models.py:71
+msgid "The type of plan, e.g. one-time or monthly"
+msgstr ""
+
+#: publisher/models.py:81
+msgid "The unique id by which the campaign can be identified by the partner"
+msgstr ""
+
+#: publisher/models.py:84
+msgid "The name of the campaign"
+msgstr ""
+
+#: publisher/models.py:87
+msgid "the number of impressions to be served during the period"
+msgstr ""
+
+#: publisher/models.py:89
+msgid "start date of the campaign"
+msgstr ""
+
+#: publisher/models.py:93
+msgid "end date of the campaign"
+msgstr ""
+
+#: publisher/models.py:96
+msgid "target url"
+msgstr ""
+
+#: publisher/models.py:102
+msgid ""
+"Whether or not the campaign creator needs a new website for the campaign"
+msgstr ""
+
+#: publisher/models.py:105
+msgid "campaign source"
+msgstr ""
+
+#: publisher/models.py:108
+msgid "campaign medium"
+msgstr ""
+
+#: publisher/models.py:114
+msgid "if the campaign is approved by the admin"
+msgstr ""
+
+#: publisher/models.py:117
+msgid "if the campaign is enabled by the creator and on going"
+msgstr ""
+
+#: publisher/models.py:120
+msgid "if the campaign is to be saved as a draft by the creator"
+msgstr ""
+
+#: publisher/models.py:124
+msgid ""
+"whether or not the organization admins have removed the campaign. Removed "
+"campaigns will not be displayed to users"
+msgstr ""
+
+#: publisher/models.py:166
+msgid "the amount of funding added to the campaign"
+msgstr ""
+
+#: publisher/models.py:168
+msgid "the date the payment has gone through"
+msgstr ""
+
+#: publisher/models.py:172
+msgid "Confirmation string received from the payment system"
+msgstr ""
+
+#: publisher/models.py:189
+msgid "The unique id by which the bill can be identified from the partner"
+msgstr ""
+
+#: publisher/models.py:191
+msgid "the day which the consumption corresponds to"
+msgstr ""
+
+#: publisher/models.py:194
+msgid "how many times the campaign has been presented to the user"
+msgstr ""
+
+#: publisher/models.py:199
+msgid "the amount of funding that has been consumed for the day the campaign"
+msgstr ""
+
+#: publisher/models.py:216
+msgid "daily_plans"
+msgstr ""
+
+#. Translators: Please keep the {{ value }} tags as they are
+#: templates/email/new_user_admin_notify_email.html:4
+#, python-format
+msgctxt "New user email"
+msgid ""
+"A new user: %(first_name)s %(last_name)s representing %(org)s has just "
+"signed up to BeePass Campaigns!"
+msgstr ""
+
+#. Translators: This is part of the new-user notification email
+#: templates/email/new_user_admin_notify_email.html:9
+msgctxt "email instruction"
+msgid ""
+"The user will not be able to access BeePass Campaigns until their account "
+"gets verified."
+msgstr ""
+
+#: templates/email/new_user_admin_notify_email.html:11
+msgctxt "email instruction"
+msgid ""
+"You can verify the account of the new user from the admin panel on the link:"
+msgstr ""
+
+#: templates/email/new_user_admin_notify_email.html:16
+msgid "From"
+msgstr ""
+
+#. Translators: Please keep the {{ value }} tags as they are
+#: templates/email/new_verification_notify_email.html:2
+#, python-format
+msgctxt "Welcome email"
+msgid "Hi %(first_name)s,"
+msgstr ""
+
+#. Translators: This is part of the new-user notification email
+#: templates/email/new_verification_notify_email.html:6
+msgctxt "Welcome email"
+msgid "Your account has been verified!"
+msgstr ""
+
+#: templates/email/new_verification_notify_email.html:8
+msgctxt "Welcome email"
+msgid "You can now login to BeePass Campaigns via the following link:"
+msgstr ""
+
+#: templates/email/new_verification_notify_email.html:12
+msgctxt "Email content"
+msgid "Cheers,"
+msgstr ""
+
+#: templates/email/new_verification_notify_email.html:13
+msgctxt "Email content"
+msgid "BeePass Campaigns Team"
+msgstr ""
+
+#: templates/email/new_verification_notify_subject.txt:1
+msgctxt "Email subject"
+msgid "Welcome to BeePass Campaigns"
+msgstr ""
